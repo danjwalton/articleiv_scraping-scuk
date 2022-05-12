@@ -30,7 +30,7 @@ invisible(lapply(list.files("r_scripts/functions", "[.]R$", full.names = T, recu
 #years is the IMF-specified years of the documents. Set a range or set as 'NULL' to capture all years.
 #isos is the IMF-specified country ISO code of the documents. Set a selection (e.g. c("GBR", "USA", "KEN")), or leave as 'NULL' to capture all years.
 
-imf_aiv_dl(download_dir = "uga", years = 2022, isos = "UGA", report_times = T)
+imf_aiv_dl(download_dir = "pdfs", years = 2018:2022, isos = NULL, report_times = T)
 
 ##
 
@@ -57,7 +57,7 @@ search_terms <- term_combiner(terms_group1 = government_terms, terms_group2 = ac
 #table_terms is the vector of key terms used to identify relevant tables - we get this from the previous function.
 #output_name is the CSV file outputted containing the page numbers of tables found by PDF.
 
-imf_aiv_tb(pdfs_dir = "uga", table_terms = search_terms, output_name = "imf_aiv_tables.csv", new_only = T, report_times = T)
+imf_aiv_tb(pdfs_dir = "pdfs", table_terms = search_terms, output_name = "imf_aiv_tables.csv", new_only = T, report_times = T)
 
 ##
 
@@ -71,6 +71,6 @@ imf_aiv_tb(pdfs_dir = "uga", table_terms = search_terms, output_name = "imf_aiv_
 #new_only is a logical indicating whether only previously un-extracted tables should be extracted. Setting this to false will redo all extractions.
 #try_OCR is a logical indicating whether to use Optical Character Recognition to extract table information which is stored as an image.
 
-imf_aiv_ex(table_file = "uga/imf_aiv_tables.csv", new_only = F, try_OCR = F, report_times = T)
+imf_aiv_ex(table_file = "pdfs/imf_aiv_tables.csv", new_only = T, try_OCR = T, report_times = T)
 
 ##

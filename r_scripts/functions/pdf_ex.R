@@ -10,11 +10,12 @@ imf_aiv_ex <- function(table_file = "pdfs/imf_aiv_tables.csv", new_only = T, try
   
   tables <- fread(table_file)
   
-  tables_present <- tables[table_pages != ""]
+  tables_present <- tables[!is.na(table_pages)]
   
-  tables_todo <- tables_present[, strsplit(table_pages, ","), by = pdf][, .(csv = paste0(gsub("[.]pdf", "", pdf), "_", V1, ".csv")), by = .(pdf, V1)]
+  tables_todo <- tables_present[, .(csv = paste0(dirname(pdf), "/", substr(iconv(gsub('[/\\?%*:|"<>]', "-", table_names, perl = T), from = "UTF-8"), 1, 250), ".csv")), by = .(pdf, table_pages, table_names)]
   
   if(new_only){
+    
     tables_existing <- list.files(dirname(table_file), ".csv", recursive = T, ignore.case = T, full.names = T)
     tables_existing <- gsub("_OCR", "", tables_existing)
     tables_todo <- tables_todo[!(csv %in% tables_existing)]
@@ -33,7 +34,7 @@ imf_aiv_ex <- function(table_file = "pdfs/imf_aiv_tables.csv", new_only = T, try
   for(i in 1:nrow(tables_todo)){
     
     pdf <- tables_todo$pdf[i]
-    page <- as.numeric(tables_todo$V1[i])
+    page <- as.numeric(tables_todo$table_pages[i])
     output_csv <- tables_todo$csv[i]
     
     tryCatch({

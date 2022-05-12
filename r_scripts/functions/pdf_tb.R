@@ -32,6 +32,10 @@ imf_aiv_tb <- function(pdf_file = NULL, pdfs_dir = NULL, table_terms, output_nam
     output <- fread(paste0(output_dir, "/", output_name))
     pdfs <- pdfs[!(pdfs %in% output$pdf)]
   }
+  
+  if(length(pdfs) == 0){
+    return(message("No new documents to check."))
+  }
 
   t1 <- system.time({
   message("Checking table", ifelse(length(pdfs) == 1, "", "s"), " in ", length(pdfs), " Article IV documents.")
@@ -42,9 +46,20 @@ imf_aiv_tb <- function(pdf_file = NULL, pdfs_dir = NULL, table_terms, output_nam
   
     tryCatch({
       pdf_pages <- suppressMessages(pdf_text(pdfs[i]))
-      table_pages <- (1:length(pdf_pages))[unlist(lapply(pdf_pages, function(x) any(grepl(paste0(paste0("Table.?\\d+\\D?[.].*", table_terms), collapse = "|"), strsplit(x, "\n")[[1]], ignore.case = T))))]
-      
-      pdf_tables[[i]] <- data.table(pdf = pdfs[i], table_pages = paste0(table_pages, collapse = ","))
+      table_pages <- (1:length(pdf_pages))[unlist(lapply(pdf_pages, function(x) any(grepl(paste0(paste0("^((?!Text).)*Table.?\\d+\\D?[.].*", table_terms), collapse = "|"), strsplit(x, "\n")[[1]], ignore.case = T, perl = T))))]
+      table_names <- c()
+      if(length(table_pages) > 0){
+        
+        for(j in 1:length(table_pages)){
+          
+          parsed_text <- strsplit(pdf_pages[[table_pages[j]]], "\n")[[1]]
+          table_title <- trimws(grep(paste0(paste0("Table.?\\d+\\D?[.].*", table_terms), collapse = "|"), parsed_text, ignore.case = T, value = T))
+          table_subtitle <- trimws(parsed_text[grep(paste0(paste0("Table.?\\d+\\D?[.].*", table_terms), collapse = "|"), parsed_text, ignore.case = T)[1] + 1])
+          if(!grepl("(", table_subtitle, fixed = T)) table_subtitle <- ""
+          table_names <- c(table_names, trimws(gsub("[/]", "", paste0(table_title, "_", table_subtitle))))
+        }
+      }
+      pdf_tables[[i]] <- suppressWarnings(data.table(pdf = pdfs[i], table_pages = table_pages, table_names = gsub(" ", "_", table_names)))
     }, error= function(e){
       fails <<- c(fails, pdfs[i])
       message("\nWarning: '", pdfs[i], "' cannot be parsed. Skipping.")
@@ -65,7 +80,7 @@ imf_aiv_tb <- function(pdf_file = NULL, pdfs_dir = NULL, table_terms, output_nam
   message("\n------------------------------\nPDF parsing summary:\n------------------------------\n",
           ifelse(new_only, paste0(nrow(output), " PDF" , ifelse(nrow(output) == 1, "", "s"), " already parsed.\n"), ""),
           length(pdfs) - length(fails), " PDF", ifelse(length(pdfs) - length(fails) == 1, "", "s"), " newly parsed.\n",
-          nrow(pdf_tables[table_pages == ""]) - length(fails), " PDF", ifelse(nrow(pdf_tables[table_pages == ""]) - length(fails) == 1, "", "s"), " did not have any matching tables found.\n",
+          nrow(pdf_tables[is.na(table_pages)]) - length(fails), " PDF", ifelse(nrow(pdf_tables[is.na(table_pages)]) - length(fails) == 1, "", "s"), " did not have any matching tables found.\n",
           length(fails), " PDF parsings failed.\n------------------------------")
   
   fwrite(pdf_tables, paste0(output_dir, "/", output_name))

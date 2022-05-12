@@ -80,16 +80,20 @@ imf_aiv_dl <- function(download_dir = "pdfs", years = 2020:2022, isos = NULL, ne
     url <- result_new$clickUri
     iso <- paste0(result_new$raw.imfisocode[[1]], collapse = ",")
     if(iso == "")iso <- "Unknown"
-    country <- paste0(result_new$raw.imfcountry[[1]], collapse = ",")
+    country <- iconv(result_new$raw.imfformalcountry[[1]], from = "UTF-8")
+    if(length(country) > 1){
+      country <- "Multiple countries specified"
+    }
+    if(country == "")country <- "Unknown"
     year <- result_new$raw.imfyear
     filename <- result_new$raw.filename
     
-    if(!dir.exists(paste0(download_dir, "/", iso))){
+    if(!dir.exists(paste0(download_dir, "/", country, "/", year))){
       
-      dir.create(paste0(download_dir, "/", iso))
+      dir.create(paste0(download_dir, "/", country, "/", year), recursive = T)
     }
     
-    fails <- fails + download.file(url, paste0(download_dir, "/", iso,"/", filename), quiet = T, mode = "wb")
+    fails <- fails + download.file(url, paste0(download_dir, "/", country, "/", year, "/", filename), quiet = T, mode = "wb")
     setTxtProgressBar(pb, i)
   }
   })
