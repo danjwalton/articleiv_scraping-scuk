@@ -56,6 +56,7 @@ imf_aiv_tb <- function(pdf_file = NULL, pdfs_dir = NULL, table_terms, output_nam
           table_title <- trimws(grep(paste0(paste0("Table.?\\d+\\D?[.].*", table_terms), collapse = "|"), parsed_text, ignore.case = T, value = T))
           table_subtitle <- trimws(parsed_text[grep(paste0(paste0("Table.?\\d+\\D?[.].*", table_terms), collapse = "|"), parsed_text, ignore.case = T)[1] + 1])
           if(!grepl("(", table_subtitle, fixed = T)) table_subtitle <- ""
+          if(grepl("Table.?\\d+\\D?[.].*", table_subtitle)) table_title <- ""
           table_names <- c(table_names, trimws(gsub("[/]", "", paste0(table_title, "_", table_subtitle))))
         }
       }
@@ -83,7 +84,7 @@ imf_aiv_tb <- function(pdf_file = NULL, pdfs_dir = NULL, table_terms, output_nam
           nrow(pdf_tables[is.na(table_pages)]) - length(fails), " PDF", ifelse(nrow(pdf_tables[is.na(table_pages)]) - length(fails) == 1, "", "s"), " did not have any matching tables found.\n",
           length(fails), " PDF parsings failed.\n------------------------------")
   
-  fwrite(pdf_tables, paste0(output_dir, "/", output_name))
+  write.csv(pdf_tables, paste0(output_dir, "/", output_name), row.names = F, fileEncoding = "UTF-8")
   if(report_times) message("Parsing took ", round(t1[3], 2), " seconds.")
 }
 

@@ -8,11 +8,11 @@ imf_aiv_ex <- function(table_file = "pdfs/imf_aiv_tables.csv", new_only = T, try
   if(length(new.packages)) install.packages(packages)
   suppressPackageStartupMessages(lapply(packages, require, character.only=T))
   
-  tables <- fread(table_file)
+  tables <- fread(table_file, encoding = "UTF-8")
   
   tables_present <- tables[!is.na(table_pages)]
   
-  tables_todo <- tables_present[, .(csv = paste0(dirname(pdf), "/", substr(iconv(gsub('[/\\?%*:|"<>]', "-", table_names, perl = T), from = "UTF-8"), 1, 250), ".csv")), by = .(pdf, table_pages, table_names)]
+  tables_todo <- tables_present[, .(csv = iconv(substr(paste0(dirname(pdf), "/", gsub("[.]pdf", "", basename(pdf)), "_", gsub('[/\\?%*:|"<>]', "-", table_names, perl = T), ".csv"), 1, 255), from = "UTF-8")), by = .(pdf, table_pages, table_names)]
   
   if(new_only){
     
@@ -61,7 +61,8 @@ imf_aiv_ex <- function(table_file = "pdfs/imf_aiv_tables.csv", new_only = T, try
       fails <<- c(fails, output_csv)
     })
     
-    
+    output[, V1 := iconv(V1, from = "UTF-8")]
+    output[, V1 := gsub("(?<=\\d) \\d+[/]", "   ", V1, perl = T)]
     fwrite(output, output_csv)
     setTxtProgressBar(pb, i)
   }
