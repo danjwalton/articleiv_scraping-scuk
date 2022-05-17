@@ -8,11 +8,11 @@ imf_aiv_ex <- function(table_file = "pdfs/imf_aiv_tables.csv", new_only = T, try
   if(length(new.packages)) install.packages(packages)
   suppressPackageStartupMessages(lapply(packages, require, character.only=T))
   
-  tables <- fread(table_file, encoding = "UTF-8")
+  tables <- fread(table_file)
   
   tables_present <- tables[!is.na(table_pages)]
   
-  tables_todo <- tables_present[, .(csv = iconv(substr(paste0(dirname(pdf), "/", gsub("[.]pdf", "", basename(pdf)), "_", gsub('[/\\?%*:|"<>]', "-", table_names, perl = T), ".csv"), 1, 255), from = "UTF-8")), by = .(pdf, table_pages, table_names)]
+  tables_todo <- tables_present[, .(csv = substr(paste0(dirname(pdf), "/", gsub("[.]pdf", "", basename(pdf)), "_", gsub('[/\\?%*:|"<>]', "-", table_names, perl = T), ".csv"), 1, 255)), by = .(pdf, table_pages, table_names)]
   
   if(new_only){
     

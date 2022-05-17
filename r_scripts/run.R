@@ -45,7 +45,7 @@ imf_aiv_dl(download_dir = "pdfs", years = 2018:2022, isos = NULL, report_times =
 #Standalone terms pick up a few cases where table names are not picked up by our general terms
 government_terms <- c("Government", "Public Sector", "National")
 account_terms <- c("Operation", "Financ", "Account", "Fiscal", "Budget", "Aggregates")
-standalone_terms <- c("Consolidated General Government", "Fiscal Developments and Projections", "Budgetary Operations", "Medium-Term Fiscal Scenario", "Fiscal Accounts", "Fiscal Aggregates", "Fiscal Operations")
+standalone_terms <- c("Consolidated General Government", "Consolidated Government", "Fiscal Developments and Projections", "Budgetary Operations", "Medium-Term Fiscal Scenario", "Fiscal Accounts", "Fiscal Aggregates", "Fiscal Operations")
 
 #This function combines our group terms such that we produce all combinations government and accounts terms
 search_terms <- term_combiner(terms_group1 = government_terms, terms_group2 = account_terms, terms_standalone = standalone_terms)

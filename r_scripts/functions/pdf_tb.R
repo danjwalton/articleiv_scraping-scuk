@@ -60,7 +60,7 @@ imf_aiv_tb <- function(pdf_file = NULL, pdfs_dir = NULL, table_terms, output_nam
           table_names <- c(table_names, trimws(gsub("[/]", "", paste0(table_title, "_", table_subtitle))))
         }
       }
-      pdf_tables[[i]] <- suppressWarnings(data.table(pdf = pdfs[i], table_pages = table_pages, table_names = gsub(" ", "_", table_names)))
+      pdf_tables[[i]] <- suppressWarnings(data.table(pdf = pdfs[i], table_pages = table_pages, table_names = iconv(gsub(" ", "_", table_names), from = "UTF-8")))
     }, error= function(e){
       fails <<- c(fails, pdfs[i])
       message("\nWarning: '", pdfs[i], "' cannot be parsed. Skipping.")
@@ -84,7 +84,7 @@ imf_aiv_tb <- function(pdf_file = NULL, pdfs_dir = NULL, table_terms, output_nam
           nrow(pdf_tables[is.na(table_pages)]) - length(fails), " PDF", ifelse(nrow(pdf_tables[is.na(table_pages)]) - length(fails) == 1, "", "s"), " did not have any matching tables found.\n",
           length(fails), " PDF parsings failed.\n------------------------------")
   
-  write.csv(pdf_tables, paste0(output_dir, "/", output_name), row.names = F, fileEncoding = "UTF-8")
+  fwrite(pdf_tables, paste0(output_dir, "/", output_name))
   if(report_times) message("Parsing took ", round(t1[3], 2), " seconds.")
 }
 

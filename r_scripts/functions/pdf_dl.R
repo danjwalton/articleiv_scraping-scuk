@@ -24,7 +24,7 @@ imf_aiv_dl <- function(download_dir = "pdfs", years = 2020:2022, isos = NULL, ne
   
   t1 <- system.time({
   search_url <- "https://www.imf.org/coveo/rest/v2?sitecoreItemUri=sitecore%3A%2F%2Fweb%2F%7B5A91C724-B3F7-41A4-B7A8-8A9426E83B65%7D%3Flang%3Den%26amp%3Bver%3D12&siteName=imf"
-  search_body <- function(i, results_per_page){paste0("aq=(%40source%3D%3D(%22Coveo_web_index%20-%20PRD93-SITECORE-IMFORG%22))%20(", imf_years, ")%20(", imf_isos, ")%20(@language=%22English%22%20OR%20%22en%22%20OR%20%22eng%22%20OR%20%22english%22)%20(@imfcontenttype=%22COUNTRYREPS%22%20OR%20%22ARTICLEIV%22)%20((%40title*%3D%22Article-iv-Consultation%22)%20OR%20(%40title*%3D%22Staff-Report%22)%20OR%20(%40title*%3D%22Review%22))&cq=%40filetype%3DPDF&searchHub=Article-iv-staff-reports&locale=en&maximumAge=900000&firstResult=", (i-1)*results_per_page, "&numberOfResults=", results_per_page, "&excerptLength=0&fieldsToExclude=%5B%5D&enableDidYouMean=false&sortCriteria=%40imfdate%20descending&queryFunctions=%5B%5D&rankingFunctions=%5B%5D&groupBy=%5B%5D&categoryFacets=%5B%5D&retrieveFirstSentences=false&timezone=&enableQuerySyntax=false&enableDuplicateFiltering=true&enableCollaborativeRating=false&debug=false&allowQueriesWithoutKeywords=true")}
+  search_body <- function(i, results_per_page){paste0("aq=(%40source%3D%3D(%22Coveo_web_index%20-%20PRD93-SITECORE-IMFORG%22))%20(", imf_years, ")%20(", imf_isos, ")%20(@language=%22English%22%20OR%20%22en%22%20OR%20%22eng%22%20OR%20%22english%22%20OR%20%22EN%22%20OR%20%22ENG%22%20OR%20%22ENGLISH%22)%20((%40title*%3D%22Article-iv-Consultation%22)%20OR%20(%40title*%3D%22Staff-Report%22)%20OR%20((%40title*%3D%22Review%22)%20(@imfcontenttype=%22COUNTRYREPS%22%20OR%20%22ARTICLEIV%22)))&cq=%40filetype%3DPDF&searchHub=Article-iv-staff-reports&locale=en&maximumAge=900000&firstResult=", (i-1)*results_per_page, "&numberOfResults=", results_per_page, "&excerptLength=0&fieldsToExclude=%5B%5D&enableDidYouMean=false&sortCriteria=%40imfdate%20descending&queryFunctions=%5B%5D&rankingFunctions=%5B%5D&groupBy=%5B%5D&categoryFacets=%5B%5D&retrieveFirstSentences=false&timezone=&enableQuerySyntax=false&enableDuplicateFiltering=true&enableCollaborativeRating=false&debug=false&allowQueriesWithoutKeywords=true")}
   
   pre <- POST(search_url, add_headers(c("content-type" = "application/x-www-form-urlencoded; charset=\"UTF-8\"")), body = search_body(1,1))
   pre_result <- fromJSON(rawToChar(pre$content))
@@ -80,7 +80,7 @@ imf_aiv_dl <- function(download_dir = "pdfs", years = 2020:2022, isos = NULL, ne
     url <- result_new$clickUri
     iso <- paste0(result_new$raw.imfisocode[[1]], collapse = ",")
     if(iso == "")iso <- "Unknown"
-    country <- result_new$raw.imfformalcountry[[1]]
+    country <- iconv(result_new$raw.imfformalcountry[[1]], from = "UTF-8")
     if(length(country) > 1){
       country <- "Multiple countries specified"
     }
@@ -94,7 +94,7 @@ imf_aiv_dl <- function(download_dir = "pdfs", years = 2020:2022, isos = NULL, ne
       dir.create(filepath, recursive = T)
     }
     
-    fails <- fails + download.file(url, paste0(download_dir, "/", country, "/", year, "/", filename), quiet = T, mode = "wb")
+    fails <- fails + download.file(url, paste0(filepath, "/", filename), quiet = T, mode = "wb")
     setTxtProgressBar(pb, i)
   }
   })
