@@ -13,6 +13,7 @@ imf_aiv_ex <- function(table_file = "pdfs/imf_aiv_tables.csv", new_only = T, try
   tables_present <- tables[!is.na(table_pages)]
   
   tables_todo <- tables_present[, .(csv = substr(paste0(dirname(pdf), "/", gsub("[.]pdf", "", basename(pdf)), "_", gsub('[/\\?%*:|"<>]', "-", table_names, perl = T), ".csv"), 1, 255)), by = .(pdf, table_pages, table_names)]
+  tables_todo[, csv := gsub("_", "", csv)]
   
   if(new_only){
     
