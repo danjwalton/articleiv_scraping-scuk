@@ -87,7 +87,7 @@ imf_aiv_dl <- function(download_dir = "pdfs", years = 2020:2022, isos = NULL, ne
     if(country == "")country <- "Unknown"
     year <- result_new$raw.imfyear
     filename <- result_new$raw.filename
-    filepath <- iconv(paste0(download_dir, "/", country, "/", year), from = "UTF-8")
+    filepath <- iconv(paste0(download_dir, "/", iso, "/", year), from = "UTF-8")
     
     if(!dir.exists(filepath)){
       

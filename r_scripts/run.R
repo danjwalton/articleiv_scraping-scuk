@@ -30,7 +30,7 @@ invisible(lapply(list.files("r_scripts/functions", "[.]R$", full.names = T, recu
 #years is the IMF-specified years of the documents. Set a range or set as 'NULL' to capture all years.
 #isos is the IMF-specified country ISO code of the documents. Set a selection (e.g. c("GBR", "USA", "KEN")), or leave as 'NULL' to capture all years.
 
-imf_aiv_dl(download_dir = "pdfs", years = 2018:2022, isos = NULL, report_times = T)
+imf_aiv_dl(download_dir = "pdfs", years = 2021:2022, isos = NULL, report_times = T)
 
 ##
 
